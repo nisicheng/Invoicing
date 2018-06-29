@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+
+<mapper namespace="team.ruike.imm.dao.SalesDao">
+    <resultMap id="salesMap" type="sales">
+        <result column="sales_id" property="salesId" />
+        <result column="sales_date" property="salesDate" />
+        <result column="client_id"  property="clientId"/>
+        <result column="employee_id" property="employeeId"/>
+        <result column="sales_accomplish" property="salesAccomplish"/>
+        <result column="event_details_id" property="eventDetailsId"/>
+        <result column="sales_activities" property="salesActivities"/>
+        <result column="sales_state" property="salesState"/>
+        <result column="merchandise_id" property="merchandiseId"/>
+        <result column="count_All" property="countAllForThis"/>
+        <result column="all_Price" property="allPriceForThis"/>
+        <result column="product_type_id" property="productTypeId"/>
+        <result column="all_volume" property="countAllForProfit"/>
+        <result column="m_cost" property="cost"/>
+        <result column="m_profit" property="profit"/>
+        <result column="all_Volume" property="allVolume"/>
+        <result column="all_Month" property="allMonth"/>
+
+
+
+        <collection property="salesInformations" ofType="salesInformation">
+            <result column="si_id" property="siId" />
+            <result column="sales_id" property="salesId" />
+            <result column="merchandise_id"  property="merchandiseId"/>
+            <result column="si_volume" property="siVolume"/>
+            <result column="units_id" property="unitsId"/>
+            <result column="si_actual_price" property="siActualPrice"/>
+            <result column="si_state" property="siState"/>
+            <result column="si_totalprice" property="siTotalPrice"/>
+            <association property="merchandise" javaType="merchandise">
+                <result column="merchandise_id" property="merchandiseId" />
+                <result column="merchandise_name" property="merchandiseName" />
+            </association>
+            <association property="units" javaType="units">
+                <result column="units_id" property="unitsId"/>
+                <result column="units_name" property="unitsName"/>
+            </association>
+        </collection>
+
+
+        <collection property="client" ofType="client">
+            <id property="clientId" column="client_id"/>
+            <result column="client_name" property="clientName" />
+            <result column="client_person_in_charge" property="clientPersonInCharge" />
+            <result column="client_post" property="clientPost" />
+            <result column="client_phone" property="clientPhone"/>
+            <result column="client_mobile_phone" property="clientMobilePhone"/>
+            <result column="client_fax" property="clientFax" />
+            <result column="client_address" property="clientAddress" />
+            <result column="client_factory_address" property="clientFactoryAddress" />
+            <result column="client_state" property="clientState" />
+        </collection>
+
+        <collection property="employee" ofType="employee">
+            <result column="employee_id" property="employeeId" />
+            <result column="employee_name" property="employeeName" />
+            <result column="position_id" property="positionId" />
+            <result column="employee_id_number" property="employeeIdNumber" />
+            <result column="employee_mobile_phone" property="employeeMobilePhone" />
+            <result column="employee_email" property="employeeEmail" />
+            <result column="employee_address" property="employeeAddress" />
+            <result column="employee_state" property="employeeState" />
+        </collection>
+
+
+        <collection property="eventDetails" ofType="eventDetails">
+            <result column="event_details_id" property="eventDetailsId"/>
+            <result column="event_details_name" property="eventDetailsName"/>
+            <result column="event_details_state" property="eventDetailsState"/>
+        </collection>
+
+    </resultMap>
+
+    <!--全部查询-郭旭-->
+    <select id="selectSales" resultMap="salesMap" parameterType="sales">
+        select * from sales s,client c,employee e,( SELECT si.*,m.merchandise_name,u.units_name,s.sales_date FROM sales_information si
+        INNER JOIN sales s ON si.sales_id=s.sales_id
+        INNER JOIN merchandise m ON m.merchandise_id=si.merchandise_id
+        INNER JOIN units u ON u.units_id=si.units_id ) as  s_i
+        <where>
+            s.client_id=c.client_id and s.employee_id=e.employee_id and s.sales_id = s_i.sales_id
+            <if test="salesId!=null and salesId>0">
+                   and s.sales_id=#{salesId}
+            </if>
+            <if test="salesDate !=null and salesDate!=''">
+                   and s.sales_date=#{salesDate}
+            </if>
+            <if test="clientId !=null and clientId>0">
+                   and s.client_id =#{clientId}
+            </if>
+            <if test="employeeId!=null and employeeId>0">
+                 and s.employee_id =#{employeeId}
+            </if>
+            <if test="salesAccomplish!=null and salesAccomplish>0">
+                 and s.sales_accomplish =#{salesAccomplish}
+            </if>
+            <if test="eventDetailsId!=null and eventDetailsId>=0">
+                and s.event_details_id =#{eventDetailsId}
+            </if>
+            <if test="salesActivities!=null and salesActivities>=0">
+                and s.sales_activities=#{salesActivities}
+            </if>
+            <if test="salesState !=null">
+                and s.sales_state=#{salesState}
+            </if>
+            <if test="merchandiseId !=null and merchandiseId>0">
+                and s_i.merchandise_id=#{merchandiseId}
+            </if>
+        </where>
+        <if test="currentPage!=null and pageSize!=null">
+            LIMIT #{currentPage},#{pageSize}
+        </if>
+    </select>
+
+
+    <update id="updateSales" parameterType="sales">
+        update sales
+        <set>
+            <if test="salesId !=null and salesId!=''">
+                  sales_id=#{salesId}
+            </if>
+            <if test="merchandiseId !=null and merchandiseId>0">
+                  merchandise_id =#{merchandiseId}
+            </if>
+            <if test="siVolume!=null and siVolume>0">
+                  si_volume =#{siVolume}
+            </if>
+            <if test="unitsId!=null and unitsId>0">
+                  units_id =#{unitsId}
+            </if>
+            <if test="siActualPrice!=null and siActualPrice>=0">
+                  si_actual_price =#{siActualPrice}
+            </if>
+            <if test="siState!=null">
+                  si_state=#{siState}
+            </if>
+            <where>
+                si_id=#{siId}
+            </where>
+        </set>
+    </update>
+
+    <insert id="insertSales" parameterType="sales">
+    insert into sales(sales_id,sales_date,client_id,employee_id,sales_accomplish) values(#{salesId},#{salesDate},#{clientId},#{employeeId},0)
+    </insert>
+
+    <insert id="insertSalesForPu" parameterType="sales">
+        insert into sales(sales_id,sales_date,client_id,employee_id,sales_accomplish) values(#{salesId},#{salesDate},#{clientId},#{employeeId},1)
+    </insert>
+
+    <!--关键销售查询-->
+    <select id="selectSalesForOrder" resultMap="salesMap" parameterType="sales">
+        select * from sales s,client c,employee e,( SELECT si.*,m.merchandise_name,u.units_name,s.sales_date,p_y.product_type_name,p_y.product_type_id
+        FROM sales_information si
+        INNER JOIN sales s ON si.sales_id=s.sales_id
+        INNER JOIN merchandise m ON m.merchandise_id=si.merchandise_id
+        INNER JOIN product_type p_y on p_y.product_type_id=m.product_type_id
+        INNER JOIN units u ON u.units_id=si.units_id ) as  s_i
+        <where>
+            s.sales_accomplish=0 and s.client_id=c.client_id and s.employee_id=e.employee_id and s.sales_id = s_i.sales_id
+            <if test="salesId!=null and salesId>0">
+                and s.sales_id=#{salesId}
+            </if>
+            <if test="salesDate !=null and salesDate!=''">
+                and s.sales_date=#{salesDate}
+            </if>
+            <if test="clientId !=null and clientId>0">
+                and s.client_id =#{clientId}
+            </if>
+            <if test="employeeId!=null and employeeId>0">
+                and s.employee_id =#{employeeId}
+            </if>
+            <if test="salesAccomplish!=null and salesAccomplish>0">
+                and s.sales_accomplish =#{salesAccomplish}
+            </if>
+            <if test="eventDetailsId!=null and eventDetailsId>=0">
+                and s.event_details_id =#{eventDetailsId}
+            </if>
+            <if test="salesActivities!=null and salesActivities>=0">
+                and s.sales_activities=#{salesActivities}
+            </if>
+            <if test="salesState !=null">
+                and s.sales_state=#{salesState}
+            </if>
+            <if test="merchandiseId !=null and merchandiseId>0">
+                and s_i.merchandise_id=#{merchandiseId}
+            </if>
+            <if test="productTypeId !=null and productTypeId>0">
+                and s_i.product_type_id=#{productTypeId}
+            </if>
+        </where>
+        ORDER BY s.sales_date desc
+        <if test="currentPage!=null and pageSize!=null">
+            LIMIT #{currentPage},#{pageSize}
+        </if>
+    </select>
+
+    <!--关键销售查询-->
+    <select id="selectSalesForThis" resultMap="salesMap" parameterType="sales">
+        select * from sales s,client c,employee e,( SELECT si.*,m.merchandise_name,u.units_name,s.sales_date,p_y.product_type_name,p_y.product_type_id
+        FROM sales_information si
+        INNER JOIN sales s ON si.sales_id=s.sales_id
+        INNER JOIN merchandise m ON m.merchandise_id=si.merchandise_id
+        INNER JOIN product_type p_y on p_y.product_type_id=m.product_type_id
+        INNER JOIN units u ON u.units_id=si.units_id ) as  s_i
+        <where>
+            s.sales_accomplish=1 and s.client_id=c.client_id and s.employee_id=e.employee_id and s.sales_id = s_i.sales_id
+            <if test="salesId!=null and salesId>0">
+                and s.sales_id=#{salesId}
+            </if>
+            <if test="salesDate !=null and salesDate!=''">
+                and s.sales_date=#{salesDate}
+            </if>
+            <if test="clientId !=null and clientId>0">
+                and s.client_id =#{clientId}
+            </if>
+            <if test="employeeId!=null and employeeId>0">
+                and s.employee_id =#{employeeId}
+            </if>
+            <if test="salesAccomplish!=null and salesAccomplish>0">
+                and s.sales_accomplish =#{salesAccomplish}
+            </if>
+            <if test="eventDetailsId!=null and eventDetailsId>=0">
+                and s.event_details_id =#{eventDetailsId}
+            </if>
+            <if test="salesActivities!=null and salesActivities>=0">
+                and s.sales_activities=#{salesActivities}
+            </if>
+            <if test="salesState !=null">
+                and s.sales_state=#{salesState}
+            </if>
+            <if test="merchandiseId !=null and merchandiseId>0">
+                and s_i.merchandise_id=#{merchandiseId}
+            </if>
+            <if test="productTypeId !=null and productTypeId>0">
+                and s_i.product_type_id=#{productTypeId}
+            </if>
+        </where>
+        ORDER BY s.sales_date desc
+        <if test="currentPage!=null and pageSize!=null">
+            LIMIT #{currentPage},#{pageSize}
+        </if>
+    </select>
+
+    <!--销售排行专用-->
+    <select id="selectSalesForThisToAll" resultMap="salesMap" parameterType="sales">
+        select  count(s.client_id) as count_All,s.client_id,SUM(s_i.si_totalprice) as all_Price,c.client_name
+        from sales s,sales_information s_i,client c
+        <where>
+            s.sales_id=s_i.sales_id
+            and s.client_id=c.client_id
+            and s.sales_accomplish=1
+            and s_i.si_state=0
+            <if test="clientId !=null and clientId>0">
+                and s.client_id =#{clientId}
+            </if>
+        </where>
+        group by c.client_name
+        ORDER BY all_Price desc
+        <if test="currentPage!=null and pageSize!=null">
+            LIMIT #{currentPage},#{pageSize}
+        </if>
+    </select>
+
+
+    <!--销售利润专用-->
+    <select id="selectSalesForProfit" resultMap="salesMap" parameterType="sales">
+        select s.sales_date, s.sales_id,c.client_id,e.employee_id,c.client_name,e.employee_name,s.sales_state,
+        SUM(s_i.si_totalprice) as all_Price,SUM(s_i.si_volume) as all_volume,
+        SUM(s_i.si_volume * m.merchandise_salse_price) as m_cost,
+        SUM(s_i.si_totalprice) - SUM(s_i.si_volume * m.merchandise_salse_price)  as m_profit
+        from sales s,sales_information s_i,client c,employee e,merchandise m
+        <where>
+            s.sales_id=s_i.sales_id
+            and s.client_id=c.client_id
+            and s.employee_id=e.employee_id
+            and s_i.merchandise_id=m.merchandise_id
+            and s.sales_accomplish=1
+            <if test="clientId !=null and clientId>0">
+                and s.client_id =#{clientId}
+            </if>
+            <if test="employeeId!=null and employeeId>0">
+                and s.employee_id =#{employeeId}
+            </if>
+        </where>
+        GROUP BY s.sales_id
+        ORDER BY s.sales_date desc
+        <if test="currentPage!=null and pageSize!=null">
+            LIMIT #{currentPage},#{pageSize}
+        </if>
+    </select>
+
+
+    <!--首页每月销售总数目专用-->
+    <select id="selectForMonth" resultMap="salesMap" parameterType="sales">
+        select month(s.sales_date) as all_Month ,SUM(s_i.si_volume) as all_Volume
+        from sales s,sales_information s_i
+        <where>
+            s.sales_id=s_i.sales_id
+            and year(s.sales_date)=2017
+        </where>
+        group by year(s.sales_date),month(s.sales_date)
+    </select>
+
+
+
+    <select id="selectSalses" resultType="int">
+        select count(*)  from sales
+        <where>
+            <if test="salesAccomplish!=null">
+                and sales_accomplish =#{salesAccomplish}
+            </if>
+            <if test="salesDate !=null and salesDate!=''">
+                and sales_date=#{salesDate}
+            </if>
+            <if test="salesState !=null">
+                and sales_state=#{salesState}
+            </if>
+        </where>
+    </select>
+
+</mapper>
+<!---->
+

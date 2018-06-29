@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+
+<mapper namespace="team.ruike.imm.dao.WarehousingDao">
+        <resultMap id="WarehousingMap" type="warehousing">
+            <result property="warehousingId" column="warehousing_id" />
+            <result property="warehousingBatchNumber" column="warehousing_batch_number" />
+            <result property="procurementId" column="procurement_id"/>
+            <result property="warehousingDate" column="warehousing_date" />
+            <result property="warehousingRemarks" column="warehousing_remarks" />
+            <result property="warehousingUserId" column="warehousing_user_id"/>
+            <result property="warehousingState" column="warehousing_state" />
+
+            <collection property="procurement" ofType="procurement">
+                <result property="procurementId" column="procurement_id"/>
+                <result property="procurementDate" column="procurement_date"/>
+                <result property="supplierId" column="supplier_id"/>
+                <result property="procurementEmployeeId" column="procurement_employee_id"/>
+                <result property="procurementAccomplish" column="procurement_accomplish"/>
+                <result property="procurementState" column="procurement_state"/>
+            </collection>
+
+            <collection property="employee" ofType="employee">
+                <result column="employee_id" property="employeeId" />
+                <result column="employee_name" property="employeeName" />
+                <result column="position_id" property="positionId" />
+                <result column="employee_id_number" property="employeeIdNumber" />
+                <result column="employee_mobile_phone" property="employeeMobilePhone" />
+                <result column="employee_email" property="employeeEmail" />
+                <result column="employee_address" property="employeeAddress" />
+                <result column="employee_state" property="employeeState" />
+            </collection>
+
+            <collection property="user" ofType="user">
+                <result column="user_id" property="userId"/>
+                <result column="user_name" property="userName"/>
+                <result column="user_password" property="userPassword"/>
+                <result column="employee_id" property="employeeId"/>
+                <result column="user_state" property="userState"/>
+            </collection>
+        </resultMap>
+
+    <select id="selectWarehousing" resultMap="WarehousingMap" parameterType="warehousing">
+        select * from warehousing w,procurement p,employee e,user u
+        <where>
+            <!--w.warehousing_buyer=u.user_id and-->
+            w.procurement_id=p.procurement_id and w.warehousing_buyer=e.employee_id and u.user_id=w.warehousing_user_id
+            and w.warehousing_state=0
+            <if test="warehousingId!=null and warehousingId>0">
+                and w.warehousing_id=#{warehousingId}
+            </if>
+            <if test="warehousingBatchNumber !=null and warehousingBatchNumber>0">
+                and w.warehousing_batch_number =#{warehousingBatchNumber}
+            </if>
+            <if test="warehousingBuyer!=null and warehousingBuyer>0">
+                and w.warehousing_buyer=#{warehousingBuyer}
+            </if>
+            <if test="procurementId !=null and procurementId>0">
+                and w.procurement_id like concat('%',#{procurementId},'%')
+            </if>
+            <if test="warehousingDate!=null and warehousingDate!=''">
+                and w.warehousing_date=#{warehousingDate}
+            </if>
+            <if test="warehousingRemarks!=null and warehousingRemarks!=''">
+                and w.warehousing_remarks =#{warehousingRemarks}
+            </if>
+            <if test="warehousingUserId !=null and warehousingUserId>0">
+                and w.warehousing_user_id=#{warehousingUserId}
+            </if>
+            <if test="warehousingState!=null and warehousingState>0">
+                and w.warehousing_state=#{warehousingState}
+            </if>
+        </where>
+        <if test="currentPage!=null and pageSize!=null">
+            LIMIT #{currentPage},#{pageSize}
+        </if>
+    </select>
+
+
+    <update id="updateWarehousing" parameterType="warehousing">
+        update warehousing
+        <set>
+            <if test="warehousingBatchNumber != null and warehousingBatchNumber>0">
+                  warehousing_batch_number = #{warehousingBatchNumber},
+            </if>
+            <if test="warehousingBuyer != null and warehousingBuyer>0">
+                  warehousing_buyer = #{warehousingBuyer},
+            </if>
+            <if test="procurementId !=null and procurementId>0">
+                  procurement_id = #{procurementId},
+            </if>
+            <if test="warehousingDate!=null and warehousingDate!=''">
+                  warehousing_date = #{warehousingDate},
+            </if>
+            <if test="warehousingRemarks!=null and warehousingRemarks!=''">
+                  warehousing_remarks = #{warehousingRemarks},
+            </if>
+            <if test="warehousingUserId !=null and warehousingUserId>0">
+                  warehousing_user_id = #{warehousingUserId},
+            </if>
+            <if test="warehousingState!=null and warehousingState>0">
+                  warehousing_state = #{warehousingState},
+            </if>
+        </set>
+        <where>
+             warehousing_id=#{warehousingId}
+        </where>
+    </update>
+
+    <insert id="insertWarehousing" parameterType="warehousing">
+        INSERT into warehousing VALUES(default,
+        #{warehousingBatchNumber},#{warehousingBuyer},
+        #{procurementId},#{warehousingDate},#{warehousingRemarks},#{warehousingUserId},#{warehousingState});
+    </insert>
+</mapper>
+

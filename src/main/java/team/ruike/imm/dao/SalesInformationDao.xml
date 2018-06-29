@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+
+<mapper namespace="team.ruike.imm.dao.SalesInformationDao">
+    <resultMap id="salesInformationMap" type="salesInformation">
+        <result column="si_id" property="siId" />
+        <result column="sales_id" property="salesId" />
+        <result column="merchandise_id"  property="merchandiseId"/>
+        <result column="si_volume" property="siVolume"/>
+        <result column="units_id" property="unitsId"/>
+        <result column="si_actual_price" property="siActualPrice"/>
+        <result column="si_state" property="siState"/>
+        <result column="si_totalprice" property="siTotalPrice"/>
+        <association property="sales" javaType="sales" >
+            <result column="sales_id" property="salesId"/>
+            <result column="sales_date" property="salesDate"/>
+
+        </association>
+        <association property="merchandise" javaType="merchandise">
+            <result column="merchandise_id" property="merchandiseId" />
+            <result column="merchandise_name" property="merchandiseName" />
+        </association>
+        <association property="units" javaType="units">
+            <result column="units_id" property="unitsId"/>
+            <result column="units_name" property="unitsName"/>
+        </association>
+    </resultMap>
+
+    <select id="selectSalesInformation" resultMap="salesInformationMap" parameterType="salesInformation">
+        SELECT si.*,m.merchandise_name,u.units_name,s.sales_date FROM sales_information si
+        INNER JOIN sales s ON si.sales_id=s.sales_id
+        INNER JOIN merchandise m ON m.merchandise_id=si.merchandise_id
+        INNER JOIN units u ON u.units_id=si.units_id
+        <where>
+            <if test="merchandiseId!=null and merchandiseId!=''">
+                and si.merchandise_id=#{merchandiseId}
+            </if>
+            <if test="merchandiseName!=null and merchandiseName!=''">
+                and si.merchandise_name=#{merchandiseName}
+            </if>
+            <if test="startTime!=null and startTime!=''">
+                and s.sales_date>=#{startTime}
+            </if>
+            <if test="endTime!=null and endTime!=''">
+                and s.sales_date&lt;=#{endTime}
+            </if>
+            <if test="siState!=null and siState>=0">
+                and si.si_state=#{siState}
+            </if>
+        <if test="currentPage!=null and pageSize!=null">
+            LIMIT #{currentPage},#{pageSize}
+        </if>
+        </where>
+    </select>
+
+    <update id="updateSalesInformation" parameterType="salesInformation">
+        update sales_information
+        <set>
+            <if test="salesId !=null and salesId!=''">
+                  sales_id=#{salesId}
+            </if>
+            <if test="merchandiseId !=null and merchandiseId>0">
+                  merchandise_id =#{merchandiseId}
+            </if>
+            <if test="siVolume!=null and siVolume>0">
+                  si_volume =#{siVolume}
+            </if>
+            <if test="unitsId!=null and unitsId>0">
+                  units_id =#{unitsId}
+            </if>
+            <if test="siActualPrice!=null and siActualPrice>=0">
+                  si_actual_price =#{siActualPrice}
+            </if>
+            <if test="siState!=null">
+                  si_state=#{siState}
+            </if>
+        </set>
+        <where>
+            si_id=#{siId}
+        </where>
+    </update>
+
+    <insert id="insertSalesInformation" parameterType="salesInformation">
+        insert into sales_information values(default,#{salesId},#{merchandiseId},#{siVolume},#{unitsId},#{siActualPrice},#{siState})
+    </insert>
+
+    <!--批量添加 nsc-->
+    <insert id="insertAll"  parameterType="java.util.List">
+        insert into sales_information(sales_id,merchandise_id,si_volume,si_actual_price,si_totalprice,units_id,si_remarks,si_state)
+        VALUES
+        <foreach collection="list" item="saveInformations" index="index" separator="," >
+            (#{saveInformations.salesId},#{saveInformations.merchandiseId},#{saveInformations.siVolume},
+            #{saveInformations.siActualPrice},#{saveInformations.siTotalPrice},#{saveInformations.unitsId},#{saveInformations.siRemarks},0)
+        </foreach>
+    </insert>
+</mapper>
+

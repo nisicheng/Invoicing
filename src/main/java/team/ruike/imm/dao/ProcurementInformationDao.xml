@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+
+<mapper namespace="team.ruike.imm.dao.ProcurementInformationDao">
+    <resultMap id="procurementInformationMap" type="procurementInformation">
+        <result column="pi_id" property="piId" />
+        <result column="merchandise_id" property="merchandiseId" />
+        <result column="pi_actual_price" property="piActualPrice" />
+        <result column="procurement_id" property="procurementId"></result>
+        <result column="pi_volume" property="piVolume" />
+        <result column="pi_state" property="piState" />
+        <result column="pi_totalPrice" property="piTotalPrice"/>
+        <result column="pi_remarks" property="piRemarks"/>
+        <association property="procurement" javaType="procurement">
+            <result column="procurement_id" property="procurementId" />
+            <result column="procurement_date" property="procurementDate" />
+            <result column="supplier_id" property="supplierId" />
+            <result column="procurement_employee_id" property="procurementEmployeeId" />
+            <result column="procurement_accomplish" property="procurementAccomplish" />
+            <result column="procurement_state" property="procurementState" />
+            <association property="procurementEmployee" javaType="employee">
+                <result column="employee_name" property="employeeName" />
+            </association>
+            <association property="supplier" javaType="supplier">
+                <result column="supplier_name" property="supplierName" />
+            </association>
+        </association>
+        <association property="units" javaType="units">
+            <result column="units_name" property="unitsName" />
+        </association>
+        <association property="merchandise" javaType="merchandise">
+            <result column="merchandise_id" property="merchandiseId"/>
+            <result column="merchandise_name" property="merchandiseName"/>
+            <result column="merchandise_specification" property="merchandiseSpecification"/>
+            <association property="productType" javaType="productType">
+                <result column="product_type_name" property="productTypeName"/>
+            </association>
+        </association>
+    </resultMap>
+
+
+
+    <!--查询采购订单还未入库的订单-->
+    <select id="selectReplenish" resultMap="procurementInformationMap">
+        SELECT SUM(pi_volume) pi_volume,pr.procurement_id,pr.merchandise_id,pr.pi_actual_price FROM procurement_information pr
+        WHERE pr.pi_state=0
+        GROUP BY pr.merchandise_id
+    </select>
+    <!--查询所有购货订单和详情订单-->
+    <select id="selectAllProcureMent" resultMap="procurementInformationMap">
+        SELECT pri.*,pr.procurement_state,mer.merchandise_name,unit.units_name,emp.employee_name,pr.procurement_date,su.supplier_name FROM procurement_information pri
+        INNER JOIN procurement pr ON pri.procurement_id=pr.procurement_id
+        INNER JOIN employee emp ON emp.employee_id=pr.procurement_employee_id
+        INNER JOIN merchandise mer ON pri.merchandise_id=mer.merchandise_id
+        INNER JOIN units unit ON unit.units_id=pri.units_id
+        INNER JOIN supplier su ON pr.supplier_id=su.supplier_id
+        <where>
+            <if test="startTime!=null and startTime!=''">
+                and pr.procurement_date>=#{startTime}
+            </if>
+            <if test="endTime!=null and endTime!=''">
+                and pr.procurement_date &lt;=#{endTime}
+            </if>
+            <if test="procurementId!=null and procurementId!=''">
+                and pri.procurement_id=#{procurementId}
+            </if>
+            <if test="piState!=null and piState>=0">
+                and pr.procurement_state=#{piState}
+            </if>
+        </where>
+    </select>
+    <!--指定条件查询采购订单详情-->
+    <select id="selecrProcurementInformation" resultMap="procurementInformationMap">
+        select * from procurement_information pi,procurement p,units u
+        <where>
+            pi.procurement_id=p.procurement_id and pi.units_id=u.units_id
+            <if test="piId!=null and piId>0">
+                and pi.pi_id=#{piId}
+            </if>
+            <if test="procurementId!=null and procurementId!=''">
+                and pi.procurement_id=#{procurementId}
+            </if>
+            <if test="merchandiseId!=null and merchandiseId>0">
+                and pi.merchandise_id=#{merchandiseId}
+            </if>
+            <if test="piActualPrice!=null and piActualPrice>0">
+                and pi.pi_actual_price=#{piActualPrice}
+            </if>
+            <if test="piVolume!=null and piVolume>0">
+                and pi.pi_volume=#{piVolume}
+            </if>
+            <if test="unitsId!=null and unitsId>0">
+                and pi.units_id=#{unitsId}
+            </if>
+            <if test="piState!=null">
+                and pi.pi_state=#{piState}
+            </if>
+        </where>
+        <if test="currentPage!=null and pageSize!=null">
+            LIMIT #{currentPage},#{pageSize}
+        </if>
+    </select>
+
+    <!--指定条件修改采购订单详情-->
+
+    <update id="updateProcurementInformation">
+        update procurement_information
+        <set>
+            <if test="procurementId!=null and procurementId!=''">
+                procurement_id=#{procurementId},
+            </if>
+            <if test="merchandiseId!=null and merchandiseId>0">
+                merchandise_id=#{merchandiseId},
+            </if>
+            <if test="piActualPrice!=null and piActualPrice>0">
+                pi_actual_price=#{piActualPrice},
+            </if>
+            <if test="piVolume!=null and piVolume>0">
+                pi_volume=#{piVolume},
+            </if>
+            <if test="unitsId!=null and unitsId>0">
+                units_id=#{unitsId},
+            </if>
+            <if test="piRemarks!=null and piRemarks!=''">
+                pi_remarks=#{piRemarks}
+            </if>
+            <if test="piTotalPrice!=null and piTotalPrice>0">
+                pi_totalPrice=#{piTotalPrice}
+            </if>
+            <if test="piState!=null">
+               pi_state=#{piState},
+            </if>
+        </set>
+        where pi_id=#{piId}
+    </update>
+
+    <!--添加采购订单详情-->
+    <insert id="insertProcurementInformation">
+        insert into procurement_information (procurement_id,merchandise_id,pi_actual_price,pi_volume,units_id,pi_state,pi_totalPrice,pi_remarks)
+        values (#{procurementId},#{merchandiseId},#{piActualPrice},#{piVolume},#{unitsId},#{piState},#{piTotalPrice},#{piRemarks});
+    </insert>
+    <!--批量添加 nsc-->
+    <insert id="insertAll" useGeneratedKeys="true"  parameterType="java.util.List">
+        insert into procurement_information (procurement_id,merchandise_id,pi_actual_price,pi_volume,units_id,pi_state,pi_totalPrice,pi_remarks)
+        values
+        <foreach collection="list" item="procurementInformations" index="index" separator="," >
+            (#{procurementInformations.procurementId},#{procurementInformations.merchandiseId},#{procurementInformations.piActualPrice},#{procurementInformations.piVolume},#{procurementInformations.unitsId},0,#{procurementInformations.piTotalPrice},#{procurementInformations.piRemarks})
+        </foreach>
+    </insert>
+    <!--批量修改购货详情订单-->
+    <update id="generateUpdateProcurementInfo">
+        UPDATE procurement_information SET pi_state=1 WHERE procurement_id in
+        <foreach collection="list" item="information" index="index" open="(" separator="," close=")" >
+            #{information.procurementId}
+        </foreach>
+    </update>
+    <!--根据商品查询一个月的购货-->
+    <select id="selectProcurementByProcurementId" resultMap="procurementInformationMap">
+        SELECT SUM(pri.pi_volume) pi_volume,SUM(pri.pi_totalPrice) pi_totalPrice,em.employee_name,m.merchandise_specification,pt.product_type_name,sup.supplier_name,SUM(pri.pi_actual_price) pi_actual_price,pri.procurement_id,pri.merchandise_id,m.merchandise_name,un.units_name,pri.pi_remarks,pr.procurement_date
+        FROM procurement_information  pri
+        INNER JOIN merchandise m ON m.merchandise_id=pri.merchandise_id
+        INNER JOIN procurement pr ON pr.procurement_id=pri.procurement_id
+        INNER JOIN units un ON un.units_id=pri.units_id
+        INNER JOIN supplier sup ON sup.supplier_id=pr.supplier_id
+        INNER JOIN product_type pt ON pt.product_type_id=m.product_type_id
+        INNER JOIN employee em ON em.employee_id=pr.procurement_employee_id
+        <!--WHERE DATE_FORMAT( pr.procurement_date,'%Y-%m')=DATE_FORMAT(NOW(),'%Y-%m')-->
+        <where>
+            <if test="startTime==null || startTime=='' and endTime==null || endTime==''">
+               and DATE_FORMAT( pr.procurement_date,'%Y-%m')=DATE_FORMAT(NOW(),'%Y-%m')
+            </if>
+            <if test="startTime!=null and startTime!=''">
+                and pr.procurement_date>=#{startTime}
+            </if>
+            <if test="endTime!=null and endTime!=''">
+                and pr.procurement_date &lt;=#{endTime}
+            </if>
+            <if test="piRemarks!=null and piRemarks!=''">
+              and  m.merchandise_name like concat('%',#{piRemarks},'%')
+            </if>
+
+        </where>
+        GROUP BY pri.merchandise_id
+    </select>
+    <!--根据商品查询购货金额排名-->
+    <select id="rankingProcurement" resultMap="procurementInformationMap">
+        SELECT SUM(pri.pi_volume) pi_volume,ms.merchandise_name FROM procurement_information pri
+        INNER JOIN merchandise  ms ON pri.merchandise_id=ms.merchandise_id
+        GROUP BY pri.merchandise_id
+        LIMIT 10;
+    </select>
+</mapper>

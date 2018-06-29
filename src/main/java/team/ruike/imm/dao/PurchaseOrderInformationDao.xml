@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+
+<mapper namespace="team.ruike.imm.dao.PurchaseOrderInformationDao">
+    <resultMap id="procurementInformationMap" type="purchaseOrderInformation">
+        <result column="poi_id" property="poiId" />
+        <result column="merchandise_id" property="merchandiseId" />
+        <result column="poi_actual_price" property="poiActualPrice" />
+        <result column="poi_volume" property="poiVolume" />
+        <result column="poi_actual_price" property="poiActualPrice" />
+        <result column="poi_state" property="poiState" />
+        <result column="poi_totalPrice" property="poiTotalPrice"/>
+        <result column="poi_remarks" property="poiRemarks"/>
+        <association property="purchaseOrder" javaType="purchaseOrder">
+            <result column="purchaseorder_id" property="purchaseOrderId" />
+            <result column="purchaseorder_date" property="purchaseOrderDate" />
+            <result column="supplier_id" property="supplierId" />
+            <result column="purchaseorder_employee_id" property="purchaseOrderEmployeeId" />
+            <result column="purchaseorder_accomplish" property="purchaseOrderAccomplish" />
+            <result column="purchaseorder_state" property="purchaseOrderState" />
+        </association>
+        <association property="units" javaType="units">
+            <result column="units_id" property="unitsId" />
+            <result column="units_name" property="unitsName" />
+            <result column="units_state" property="unitsState" />
+        </association>
+    </resultMap>
+
+    <!--批量添加 nsc-->
+    <insert id="batchInsertPurchaseOrder" useGeneratedKeys="true"  parameterType="java.util.List">
+        INSERT INTO purchaseorder_information(purchaseorder_id,merchandise_id,poi_actual_price,poi_volume,units_id,poi_state,poi_totalPrice,poi_remarks)
+        VALUES
+        <foreach collection="list" item="purchaseOrderInformations" index="index" separator="," >
+            (#{purchaseOrderInformations.purchaseOrderId},#{purchaseOrderInformations.merchandiseId},#{purchaseOrderInformations.poiActualPrice},#{purchaseOrderInformations.poiVolume},#{purchaseOrderInformations.unitsId},0,#{purchaseOrderInformations.poiTotalPrice},#{purchaseOrderInformations.poiRemarks})
+        </foreach>
+
+    </insert>
+</mapper>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+
+<mapper namespace="team.ruike.imm.dao.SalesStatusDao">
+    <resultMap id="salesStatusMap" type="salesStatus">
+        <result column="sales_status_id" property="salesStatusId" />
+        <result column="sales_status_name" property="salesStatusName" />
+        <result column="sales_status_state"  property="salesStatusState"/>
+    </resultMap>
+
+    <select id="selectSalesStatus" resultMap="salesStatusMap" parameterType="salesStatus">
+        select * from sales_status
+        <where>
+             1=1 and sales_status_state=0
+            <if test="salesStatusId!=null and salesStatusId>0">
+                   and sales_status_id=#{salesStatusId}
+            </if>
+            <if test="salesStatusName !=null and salesStatusName!=''">
+                   and sales_status_name=#{salesStatusName}
+            </if>
+            <if test="salesStatusState !=null and salesStatusState!=''">
+                   and sales_status_state =#{salesStatusState}
+            </if>
+        </where>
+        <if test="currentPage!=null and pageSize!=null">
+            LIMIT #{currentPage},#{pageSize}
+        </if>
+    </select>
+
+    <update id="updateSalesStatus" parameterType="salesStatus">
+        update sales_status
+        <set>
+            <if test="salesStatusName !=null and salesStatusName!=''">
+                 sales_status_name=#{salesStatusName},
+            </if>
+            <if test="salesStatusState !=null and salesStatusState!=''">
+                  sales_status_state =#{salesStatusState}
+            </if>
+        </set>
+        <where>
+            sales_status_id=#{salesStatusId}
+        </where>
+    </update>
+
+    <insert id="insertSalesStatus" parameterType="salesStatus">
+        insert into sales_status values(default,#{salesStatusName},#{salesStatusState})
+    </insert>
+</mapper>
+

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+
+<mapper namespace="team.ruike.imm.dao.ProcurementDao">
+    <resultMap id="procurementMap" type="procurement">
+        <result column="procurement_id" property="procurementId" />
+        <result column="procurement_date" property="procurementDate" />
+        <result column="procurement_accomplish" property="procurementAccomplish" />
+        <result column="procurement_state" property="procurementState" />
+        <collection property="supplier" ofType="supplier">
+            <result column="supplier_id" property="supplierId" />
+            <result column="supplier_name" property="supplierName" />
+            <result column="supplier_person_in_charge" property="supplierPersonInCharge" />
+            <result column="supplier_post" property="supplierPost" />
+            <result column="supplier_phone" property="supplierPhone" />
+            <result column="supplier_mobile_phone" property="supplierMobilePhone" />
+            <result column="supplier_fax" property="supplierFax" />
+            <result column="supplier_address" property="supplierAddress" />
+            <result column="supplier_factory_address" property="supplierFactoryAddress" />
+            <result column="supplier_state" property="supplierState" />
+        </collection>
+        <collection property="procurementEmployee" ofType="employee">
+            <result column="employee_id" property="employeeId" />
+            <result column="employee_name" property="employeeName" />
+            <result column="position_id" property="positionId" />
+            <result column="employee_id_number" property="employeeIdNumber" />
+            <result column="employee_mobile_phone" property="employeeMobilePhone" />
+            <result column="employee_email" property="employeeEmail" />
+            <result column="employee_address" property="employeeAddress" />
+            <result column="employee_state" property="employeeState" />
+        </collection>
+    </resultMap>
+
+
+    <!--指定条件查询采购订单-->
+    <select id="selecrProcurement" resultMap="procurementMap">
+        select * from procurement p,supplier s,employee e
+        <where>
+            p.procurement_employee_id=e.employee_id and p.supplier_id=s.supplier_id
+            <if test="procurementId!=null and procurementId>0">
+                and p.procurement_id=#{procurementId}
+            </if>
+            <if test="procurementDate!=null and procurementDate">
+                and p.procurement_date=#{procurementDate}
+            </if>
+            <if test="supplierId!=null and supplierId>0">
+                and p.supplier_id=#{supplierId}
+            </if>
+            <if test="procurementEmployeeId!=null and procurementEmployeeId>0">
+                and p.procurement_employee_id=#{procurementEmployeeId}
+            </if>
+            <if test="procurementAccomplish!=null and procurementAccomplish>0">
+                and p.procurement_accomplish=#{procurementAccomplish}
+            </if>
+            <if test="procurementState!=null">
+                and p.procurement_state=#{procurementState}
+            </if>
+        </where>
+        <if test="currentPage!=null and pageSize!=null">
+            LIMIT #{currentPage},#{pageSize}
+        </if>
+    </select>
+    <select id="procurementSize" resultMap="procurementMap">
+        SELECT * FROM procurement WHERE procurement_date=NOW();
+    </select>
+    <select id="selectAll" resultMap="procurementMap">
+        SELECT * FROM procurement WHERE procurement_id LIKE "GHD%"
+    </select>
+    <select id="selectll" resultMap="procurementMap">
+        SELECT * FROM procurement WHERE procurement_id LIKE "GH2%"
+    </select>
+    <!--指定条件修改采购订单-->
+    <update id="updateProcurement" parameterType="procurement">
+        update procurement
+        <set>
+            <if test="procurementDate!=null and procurementDate">
+                procurement_date=#{procurementDate},
+            </if>
+            <if test="supplierId!=null and supplierId>0">
+                supplier_id=#{supplierId},
+            </if>
+            <if test="procurementEmployeeId!=null and procurementEmployeeId>0">
+                procurement_employee_id=#{procurementEmployeeId},
+            </if>
+            <if test="procurementAccomplish!=null and procurementAccomplish>0">
+                procurement_accomplish=#{procurementAccomplish},
+            </if>
+            <if test="procurementState!=null">
+                procurement_state=#{procurementState},
+            </if>
+        </set>
+        where procurement_id=#{procurementId}
+    </update>
+
+    <!--添加采购订单-->
+    <insert id="insertProcurement" parameterType="procurement">
+        insert into procurement (procurement_id,procurement_date,supplier_id,procurement_employee_id)
+        values (#{procurementId},#{procurementDate},#{supplierId},#{procurementEmployeeId});
+    </insert>
+    <!--批量修改采购订单-->
+    <update id="generateUpdateProcurement">
+        UPDATE procurement SET procurement_state=1 WHERE procurement_id in
+        <foreach collection="list" item="procurements" index="index" open="(" separator="," close=")" >
+            #{procurements.procurementId}
+        </foreach>
+    </update>
+</mapper>

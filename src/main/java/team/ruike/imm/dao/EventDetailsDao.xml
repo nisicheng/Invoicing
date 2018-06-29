@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+
+<mapper namespace="team.ruike.imm.dao.EventDetailsDao">
+
+    <resultMap id="eventDetailsMap" type="eventDetails">
+        <result column="event_details_id" property="eventDetailsId" />
+        <result column="event_details_name" property="eventDetailsName" />
+        <result column="event_details_state" property="eventDetailsState" />
+    </resultMap>
+
+    <!--指定条件查询活动详情-->
+    <select id="selecrEventDetails" resultMap="eventDetailsMap">
+        select * from event_details
+        <where>
+            1=1
+            <if test="eventDetailsId!=null and eventDetailsId!=''">
+                and event_details_id=#{eventDetailsId}
+            </if>
+            <if test="eventDetailsName!=null and eventDetailsName!=''">
+                and event_details_name=#{eventDetailsName}
+            </if>
+            <if test="eventDetailsState!=null">
+                and event_details_state=#{eventDetailsState}
+            </if>
+        </where>
+        <if test="currentPage!=null and pageSize!=null">
+            LIMIT #{currentPage},#{pageSize}
+        </if>
+    </select>
+    <!--指定条件修改活动详情-->
+    <update id="updateEventDetails" parameterType="eventDetails">
+        update event_details
+        <set>
+            <if test="eventDetailsName!=null and eventDetailsName!=''">
+                event_details_name=#{eventDetailsName},
+            </if>
+            <if test="eventDetailsState!=null">
+                event_details_state=#{eventDetailsState},
+            </if>
+        </set>
+                where event_details_id=#{eventDetailsId}
+    </update>
+
+    <!--增加活动详情-->
+    <insert id="insertEventDetails" parameterType="eventDetails">
+        insert into event_details (event_details_name,event_details_state)
+        values (#{eventDetailsName},#{eventDetailsState});
+    </insert>
+</mapper>

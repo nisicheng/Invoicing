@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+
+<mapper namespace="team.ruike.imm.dao.UnitsDao">
+    <resultMap id="unitsMap" type="units">
+        <result property="unitsId" column="units_id" />
+        <result property="unitsName" column="units_name" />
+        <result property="unitsState" column="units_state" />
+    </resultMap>
+
+    <select id="selectUnits" resultMap="unitsMap" parameterType="units">
+        select * from units
+        <where>
+            1=1 and units_state=0
+            <if test="unitsId!=null and unitsId>0">
+                and units_id=#{unitsId}
+            </if>
+            <if test="unitsName!=null and unitsName!=''">
+                and units_name=#{unitsName}
+            </if>
+            <if test="unitsState!=null and unitsState!=''">
+                and units_state=#{unitsState}
+            </if>
+        </where>
+        <if test="currentPage!=null and pageSize!=null">
+            LIMIT #{currentPage},#{pageSize}
+        </if>
+    </select>
+
+
+    <update id="updateUnits" parameterType="units">
+        update units
+        <set>
+            <if test="unitsName!=null and unitsName!=''">
+                 units_name=#{unitsName},
+            </if>
+            <if test="unitsState!=null and unitsState!=''">
+                 units_state=#{unitsState},
+            </if>
+        </set>
+        <where>
+            units_id=#{unitsId}
+        </where>
+    </update>
+
+    <insert id="insertUnits" parameterType="units">
+        INSERT units VALUES(default,#{unitsName},#{unitsState});
+    </insert>
+</mapper>
+

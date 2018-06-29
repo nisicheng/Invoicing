@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+
+<mapper namespace="team.ruike.imm.dao.ClientDao">
+    <resultMap id="clientMap" type="client">
+        <result column="client_id" property="clientId" />
+        <result column="client_name" property="clientName" />
+        <result column="client_person_in_charge" property="clientPersonInCharge" />
+        <result column="client_post" property="clientPost" />
+        <result column="client_phone" property="clientPhone" />
+        <result column="client_mobile_phone" property="clientMobilePhone" />
+        <result column="client_fax" property="clientFax" />
+        <result column="client_address" property="clientAddress" />
+        <result column="client_factory_address" property="clientFactoryAddress" />
+        <result column="client_state" property="clientState" />
+    </resultMap>
+    <!--指定条件查询客户信息-->
+    <select id="selecrClient" resultMap="clientMap">
+        select * from client
+        <where>
+            1=1
+            <if test="clientId!=null and  clientId>0">
+                and client_id=#{clientId}
+            </if>
+            <if test="clientName!=null and  clientName!=''">
+                and client_name=#{clientName}
+            </if>
+            <if test="clientPersonInCharge!=null and  clientPersonInCharge!=''">
+                and client_person_in_charge=#{clientPersonInCharge}
+            </if>
+            <if test="clientPost!=null and  clientPost!=''">
+                and client_post=#{clientPost}
+            </if>
+            <if test="clientPhone!=null and  clientPhone!=''">
+                and client_phone=#{clientPhone}
+            </if>
+            <if test="clientMobilePhone!=null and  clientMobilePhone!=''">
+                and client_mobile_phone=#{clientMobilePhone}
+            </if>
+            <if test="clientFax!=null and  clientFax!=''">
+                and client_fax=#{clientFax}
+            </if>
+            <if test="clientAddress!=null and  clientAddress!=''">
+                and client_address=#{clientAddress}
+            </if>
+            <if test="clientFactoryAddress!=null and  clientFactoryAddress!=''">
+                and client_factory_address=#{clientFactoryAddress}
+            </if>
+            <if test="clientState!=null">
+                and client_state=#{clientState}
+            </if>
+        </where>
+    </select>
+
+    <select id="count" resultType="int" >
+        select count(*) from client
+        <where>
+            <if test="clientName!=null and  clientName!=''">
+                concat(client_person_in_charge,
+                '!,(%!)#',client_name,
+                '!,(%!)#',client_mobile_phone,
+                '*!,(%!)#',client_phone,
+                '*!,(%!)#',client_factory_address,
+                '*!,(%!)#',client_address,
+                '*!,(%!)#',client_post,
+                '*!,(%!)#',client_fax
+                )
+                like CONCAT('%',#{clientName},'%')
+            </if>
+            <if test="clientState!=null">
+                and client_state=#{clientState}
+            </if>
+        </where>
+    </select>
+    <select id="pages" resultMap="clientMap">
+        select * from client
+        <where>
+            <if test="clientName!=null and  clientName!=''">
+                concat(client_person_in_charge,
+                '!,(%!)#',client_name,
+                '!,(%!)#',client_mobile_phone,
+                '*!,(%!)#',client_phone,
+                '*!,(%!)#',client_factory_address,
+                '*!,(%!)#',client_address,
+                '*!,(%!)#',client_post,
+                '*!,(%!)#',client_fax
+                )
+                like CONCAT('%',#{clientName},'%')
+            </if>
+            <if test="clientState!=null">
+                and client_state=#{clientState}
+            </if>
+            <if test="currentPage!=null and pageSize!=null">
+                LIMIT #{currentPage},#{pageSize}
+            </if>
+        </where>
+    </select>
+    <!--指定条件修改客户信息-->
+    <update id="updateClient" parameterType="client">
+        update client
+        <set>
+            <if test="clientName!=null and  clientName!=''">
+                client_name=#{clientName},
+            </if>
+            <if test="clientPersonInCharge!=null and  clientPersonInCharge!=''">
+                client_person_in_charge=#{clientPersonInCharge},
+            </if>
+            <if test="clientPost!=null and  clientPost!=''">
+                client_post=#{clientPost},
+            </if>
+            <if test="clientPhone!=null and  clientPhone!=''">
+                client_phone=#{clientPhone},
+            </if>
+            <if test="clientMobilePhone!=null and  clientMobilePhone!=''">
+                client_mobile_phone=#{clientMobilePhone},
+            </if>
+            <if test="clientFax!=null and  clientFax!=''">
+                client_fax=#{clientFax},
+            </if>
+            <if test="clientAddress!=null and  clientAddress!=''">
+                client_address=#{clientAddress},
+            </if>
+            <if test="clientFactoryAddress!=null and  clientFactoryAddress!=''">
+                client_factory_address=#{clientFactoryAddress},
+            </if>
+            <if test="clientState!=null">
+                client_state=#{clientState},
+            </if>
+        </set>
+               where client_id=#{clientId}
+    </update>
+    <!--修改为不合作客户-->
+    <update id="noncooperation" parameterType="java.util.List">
+            <foreach collection="list" item="client" index="index" open="" close="" separator=";" >
+                update client
+                <set>
+                    client_state=1
+                </set>
+                where client_id=#{client.clientId}
+            </foreach>
+    </update>
+    <!--修改为合作客户-->
+    <update id="cooperative" parameterType="java.util.List">
+        <foreach collection="list" item="client" index="index" open="" close="" separator=";" >
+            update client
+            <set>
+                client_state=0
+            </set>
+            where client_id=#{client.clientId}
+        </foreach>
+    </update>
+    <insert id="insertClient">
+        insert into client(client_name,client_person_in_charge,client_post,client_phone,client_mobile_phone,
+        client_fax,client_address,client_factory_address,client_state)
+        values
+            (#{clientName},#{clientPersonInCharge},#{clientPost},#{clientPhone},#{clientMobilePhone},
+            #{clientFax},#{clientAddress},#{clientFactoryAddress},#{clientState})
+    </insert>
+</mapper>

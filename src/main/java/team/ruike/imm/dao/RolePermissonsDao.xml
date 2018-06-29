@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+
+<mapper namespace="team.ruike.imm.dao.RolePermissionsDao">
+    <resultMap id="rolePermissionsMap" type="rolePermissions">
+        <result column="role_id" property="roleId" />
+        <result column="role_give" property="roleGive" />
+
+        <collection property="user" ofType="user">
+            <result column="user_id" property="userId"></result>
+            <result column="user_name" property="userName"></result>
+            <result column="user_password" property="userPassword"></result>
+            <result column="employee_id" property="employeeId"></result>
+            <result column="user_state" property="userState"></result>
+        </collection>
+
+        <collection property="employee" ofType="employee">
+            <result column="permissions_id" property="permissionsId" />
+            <result column="permissions_name" property="permissionsName" />
+        </collection>
+    </resultMap>
+
+    <select id="selectRolePermissions" resultMap="rolePermissionsMap" parameterType="rolePermissions">
+        select * from role_permissions
+        <where>
+             1=1
+            <if test="roleId!=null and roleId>0">
+                    and role_id=#{roleId}
+            </if>
+            <if test="userId !=null and userId>0">
+                    and user_id=#{userId}
+            </if>
+            <if test="PermissionsId !=null and PermissionsId>0">
+                    and permissions_id =#{PermissionsId}
+            </if>
+            <if test="roleGive!=null and roleGive>0">
+                    and role_give =#{roleGive}
+            </if>
+        </where>
+        <if test="currentPage!=null and pageSize!=null">
+            LIMIT #{currentPage},#{pageSize}
+        </if>
+    </select>
+
+    <update id="updateRolePermissions" parameterType="rolePermissions">
+        update role_permissions
+        <set>
+            <if test="userId !=null and userId>0">
+                  user_id=#{userId}
+            </if>
+            <if test="PermissionsId !=null and PermissionsId>0">
+                  permissions_id =#{PermissionsId}
+            </if>
+            <if test="roleGive!=null and roleGive>0">
+                  role_give =#{roleGive}
+            </if>
+            <where>
+                role_id=#{roleId}
+            </where>
+        </set>
+    </update>
+
+    <insert id="insertRolePermissions" parameterType="rolePermissions">
+        insert into role_permissions values(default,#{userId},#{PermissionsId},#{roleGive})
+    </insert>
+</mapper>
+

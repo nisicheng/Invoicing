@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+
+<mapper namespace="team.ruike.imm.dao.ProductTypeDao">
+    <resultMap id="productTypeMap" type="productType">
+        <result column="product_type_id" property="productTypeId" />
+        <result column="product_type_name" property="productTypeName" />
+        <result column="product_type_state"  property="productTypeState"/>
+    </resultMap>
+
+    <select id="selectProductType" resultMap="productTypeMap" parameterType="productType">
+        select * from product_type
+        <where>
+             1=1
+            <if test="productTypeId!=null and productTypeId>0">
+                   and product_type_id=#{productTypeId}
+            </if>
+            <if test="productTypeName !=null and productTypeName!=''">
+                   and product_type_name=#{productTypeName}
+            </if>
+            <if test="productTypeState !=null and productTypeState>0">
+                   and product_type_state =#{productTypeState}
+            </if>
+        </where>
+        <if test="currentPage!=null and pageSize!=null">
+            LIMIT #{currentPage},#{pageSize}
+        </if>
+    </select>
+
+    <update id="updateProductType" parameterType="productType">
+        update product_type
+        <set>
+            <if test="productTypeName !=null and productTypeName!=''">
+                  product_type_name=#{productTypeName}
+            </if>
+            <if test="productTypeState !=null and productTypeState>0">
+                  product_type_state =#{productTypeState}
+            </if>
+            <where>
+                product_type_id=#{productTypeId}
+            </where>
+        </set>
+    </update>
+
+    <insert id="insertProductType" parameterType="productType">
+        insert into product_type values(default,#{productTypeName},#{productTypeState})
+    </insert>
+</mapper>
+

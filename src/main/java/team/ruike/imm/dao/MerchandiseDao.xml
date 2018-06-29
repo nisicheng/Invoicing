@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="team.ruike.imm.dao.MerchandiseDao">
+    <resultMap id="merchandiseMap" type="merchandise">
+        <result column="merchandise_id" property="merchandiseId" />
+        <result column="merchandise_code" property="merchandiseCode" />
+        <result column="merchandise_name" property="merchandiseName" />
+        <result column="merchandise_specification" property="merchandiseSpecification" />
+        <result column="merchandise_place_of_origin" property="merchandisePlaceOfOrigin" />
+        <result column="merchandise_safety_stock" property="merchandiseSafetyStock" />
+        <result column="merchandise_actual_quntity" property="merchandiseActualQuntity" />
+        <result column="merchandise_salse_price" property="merchandiseSalsePrice" />
+        <result column="merchandise_state" property="merchandiseState" />
+        <result column="units_id" property="unitsId"/>
+        <result column="sales_status_id" property="salesStatusId"/>
+        <result column="product_type_id" property="productTypeId"/>
+        <result column="sumstock" property="sumStock"/>
+        <association property="productType" javaType="productType">
+            <result column="Product_type_id" property="productTypeId" />
+            <result column="Product_type_name" property="productTypeName" />
+            <result column="Product_type_state" property="productTypeState" />
+        </association>
+        <association property="units" javaType="units">
+            <result column="units_id" property="unitsId" />
+            <result column="units_name" property="unitsName" />
+            <result column="units_state" property="unitsState" />
+        </association>
+        <association property="salesStatus" javaType="salesStatus">
+            <result column="sales_status_id" property="salesStatusId" />
+            <result column="sales_status_name" property="salesStatusName" />
+            <result column="sales_status_state" property="salesStatusState" />
+        </association>
+    </resultMap>
+
+    <select id="sumstock" resultType="int">
+        select COUNT(*) sumstock from merchandise
+        <where>
+            merchandise_state=0
+            and merchandise_actual_quntity &lt; merchandise_safety_stock
+        </where>
+    </select>
+    <!--nsc 查询所有商品-->
+    <select id="selectAll" resultMap="merchandiseMap">
+        SELECT * FROM merchandise m
+        INNER JOIN units u on m.units_id=u.units_id
+        <where>
+            <if test="merchandiseId!=null and merchandiseId>0">
+                m.merchandise_id=#{merchandiseId}
+            </if>
+            <if test="merchandiseName!=null and merchandiseName!=''">
+                and  m.merchandise_name  like '${merchandiseName}%'
+            </if>
+        </where>
+    </select>
+    <!--查询当前库存小于安全库存-->
+    <select id="selectRelenish" resultMap="merchandiseMap">
+        SELECT m.*,u.units_name FROM merchandise m
+        INNER JOIN units u
+        ON u.units_id=m.units_id
+        WHERE  m.merchandise_actual_quntity &lt;= m.merchandise_safety_stock
+        <if test="productTypeId!=null and productTypeId>0">
+            and m.product_type_id=#{productTypeId}
+        </if>
+        <if test="merchandiseName!=null and merchandiseName!=''">
+            and m.merchandise_name like concat('%',#{merchandiseName},'%')
+        </if>
+    </select>
+    <!--指定条件查询商品信息-->
+    <select id="sanMerchandise" resultMap="merchandiseMap">
+        select * from merchandise m
+        inner join product_type p on m.product_type_id=p.product_type_id
+        inner join units u on m.units_id=u.units_id
+        inner join sales_status s on m.sales_status_id=s.sales_status_id
+        <where>
+            concat(m.merchandise_name,
+            '!,(%!)#',m.merchandise_code,
+            '!,(%!)#', m.merchandise_specification,
+            '*!,(%!)#',merchandise_place_of_origin,
+            '*!,(%!)#',merchandise_salse_price)
+            like CONCAT('%',#{about},'%')
+            <if test="merchandiseId!=null and merchandiseId>0">
+                and m.merchandise_id=#{merchandiseId}
+            </if>
+            <if test="merchandiseCode!=null and merchandiseCode!=''">
+                and m.merchandise_code=#{merchandiseCode}
+            </if>
+            <if test="merchandiseName!=null and merchandiseName!=''">
+                and m.merchandise_name like concat('%',#{merchandiseName},'%')
+            </if>
+            <if test="merchandiseSpecification!=null and merchandiseSpecification!=''">
+                and m.merchandise_specification=#{merchandiseSpecification}
+            </if>
+            <if test="productTypeId!=null and productTypeId>0">
+                and m.product_type_id=#{productTypeId}
+            </if>
+            <if test="unitsId!=null and unitsId>0">
+                and m.units_id=#{unitsId}
+            </if>
+            <if test="merchandisePlaceOfOrigin!=null and merchandisePlaceOfOrigin!=''">
+                and m.merchandise_place_of_origin=#{merchandisePlaceOfOrigin}
+            </if>
+            <if test="merchandiseSafetyStock!=null and merchandiseSafetyStock>0">
+                and m.merchandise_safety_stock=#{merchandiseSafetyStock}
+            </if>
+            <if test="merchandiseActualQuntity!=null and merchandiseActualQuntity>0">
+                and m.merchandise_actual_quntity=#{merchandiseActualQuntity}
+            </if>
+            <if test="merchandiseSalsePrice!=null and merchandiseSalsePrice>0">
+                and m.merchandise_salse_price=#{merchandiseSalsePrice}
+            </if>
+            <if test="salesStatusId!=null and salesStatusId>0">
+                and m.sales_status_id=#{salesStatusId}
+            </if>
+            <if test="merchandiseState!=null">
+                and m.merchandise_state=#{merchandiseState}
+            </if>
+        </where>
+        <if test="currentPage!=null and pageSize!=null">
+            LIMIT #{currentPage},#{pageSize}
+        </if>
+        order by m.merchandise_id asc
+    </select>
+    <!--指定条件查询商品信息-->
+    <select id="selecrMerchandise" resultMap="merchandiseMap">
+        select * from merchandise m,product_type p,units u,sales_status s
+        <where>
+            m.product_type_id=p.product_type_id and m.units_id=u.units_id and m.sales_status_id=s.sales_status_id
+            <if test="merchandiseId!=null and merchandiseId>0">
+                and m.merchandise_id=#{merchandiseId}
+            </if>
+            <if test="merchandiseCode!=null and merchandiseCode!=''">
+                and m.merchandise_code=#{merchandiseCode}
+            </if>
+            <if test="merchandiseName!=null and merchandiseName!=''">
+                and m.merchandise_name like concat('%',#{merchandiseName},'%')
+            </if>
+            <if test="merchandiseSpecification!=null and merchandiseSpecification!=''">
+                and m.merchandise_specification=#{merchandiseSpecification}
+            </if>
+            <if test="productTypeId!=null and productTypeId>0">
+                and m.product_type_id=#{productTypeId}
+            </if>
+            <if test="unitsId!=null and unitsId>0">
+                and m.units_id=#{unitsId}
+            </if>
+            <if test="merchandisePlaceOfOrigin!=null and merchandisePlaceOfOrigin!=''">
+                and m.merchandise_place_of_origin=#{merchandisePlaceOfOrigin}
+            </if>
+            <if test="merchandiseSafetyStock!=null and merchandiseSafetyStock>0">
+                and m.merchandise_safety_stock=#{merchandiseSafetyStock}
+            </if>
+            <if test="merchandiseActualQuntity!=null and merchandiseActualQuntity>0">
+                and m.merchandise_actual_quntity=#{merchandiseActualQuntity}
+            </if>
+            <if test="merchandiseSalsePrice!=null and merchandiseSalsePrice>0">
+                and m.merchandise_salse_price=#{merchandiseSalsePrice}
+            </if>
+            <if test="salesStatusId!=null and salesStatusId>0">
+                and m.sales_status_id=#{salesStatusId}
+            </if>
+            <if test="merchandiseState!=null">
+                and m.merchandise_state=#{merchandiseState}
+            </if>
+        </where>
+        <if test="currentPage!=null and pageSize!=null">
+            LIMIT #{currentPage},#{pageSize}
+        </if>
+        order by m.merchandise_id asc
+    </select>
+    <!--指定条件修改商品信息-->
+    <update id="updateMerchandise" parameterType="merchandise">
+        update merchandise
+        <set>
+            <if test="merchandiseCode!=null and merchandiseCode!=''">
+                merchandise_code=#{merchandiseCode},
+            </if>
+            <if test="merchandiseName!=null and merchandiseName!=''">
+                merchandise_name=#{merchandiseName},
+            </if>
+            <if test="merchandiseSpecification!=null and merchandiseSpecification!=''">
+                merchandise_specification=#{merchandiseSpecification},
+            </if>
+            <if test="productTypeId!=null and productTypeId>0">
+                product_type_id=#{productTypeId},
+            </if>
+            <if test="unitsId!=null and unitsId>0">
+                units_id=#{unitsId},
+            </if>
+            <if test="merchandisePlaceOfOrigin!=null and merchandisePlaceOfOrigin!=''">
+                merchandise_place_of_origin=#{merchandisePlaceOfOrigin},
+            </if>
+            <if test="merchandiseSafetyStock!=null and merchandiseSafetyStock>0">
+                merchandise_safety_stock=#{merchandiseSafetyStock},
+            </if>
+            <if test="merchandiseActualQuntity!=null and merchandiseActualQuntity>0">
+                merchandise_actual_quntity=#{merchandiseActualQuntity},
+            </if>
+            <if test="merchandiseSalsePrice!=null and merchandiseSalsePrice!=''  and merchandiseSalsePrice>0">
+                merchandise_salse_price=#{merchandiseSalsePrice},
+            </if>
+            <if test="salesStatusId!=null and salesStatusId>0">
+                sales_status_id=#{salesStatusId},
+            </if>
+            <if test="merchandiseState!=null">
+                merchandise_state=#{merchandiseState},
+            </if>
+        </set>
+        where merchandise_id=#{merchandiseId}
+    </update>
+    <!--增加商品信息-->
+    <insert id="insertMerchandise" parameterType="merchandise">
+        insert into merchandise (merchandise_code,merchandise_name,merchandise_specification,product_type_id,units_id,merchandise_place_of_origin,merchandise_safety_stock,merchandise_actual_quntity,merchandise_salse_price,sales_status_id,merchandise_state)
+        values (#{merchandiseCode},#{merchandiseName},#{merchandiseSpecification},#{productTypeId},#{unitsId},#{merchandisePlaceOfOrigin},#{merchandiseSafetyStock},#{merchandiseActualQuntity},#{merchandiseSalsePrice},#{salesStatusId},#{merchandiseState});
+    </insert>
+    <select id="selectOne">
+        select * from merchandise
+    </select>
+
+    <select id="count" resultType="int" >
+        select count(*) from merchandise
+        <where>
+            <if test="merchandiseName!=null and  merchandiseName!=''">
+                concat(merchandise_code,
+                '!,(%!)#',merchandise_name,
+                '!,(%!)#',merchandise_specification,
+                '*!,(%!)#',merchandise_place_of_origin,
+                '*!,(%!)#',merchandise_safety_stock,
+                '*!,(%!)#',merchandise_actual_quntity,
+                '*!,(%!)#',merchandise_salse_price
+                )
+                like CONCAT('%',#{merchandiseName},'%')
+            </if>
+            <if test="productTypeId!=null and  productTypeId>0">
+                and  product_type_id=#{productTypeId}
+            </if>
+            <if test="salesStatusId!=null and salesStatusId>0">
+                and sales_status_id=#{salesStatusId}
+            </if>
+            <if test="unitsId!=null and unitsId>0">
+                and  units_id=#{unitsId}
+            </if>
+            <if test="merchandiseState!=null">
+                and merchandise_state=#{merchandiseState}
+            </if>
+        </where>
+    </select>
+    <select id="pagerMerchandise" resultMap="merchandiseMap">
+        select * from merchandise m,product_type p,units u,sales_status s
+        <where>
+            m.product_type_id=p.product_type_id
+            and m.units_id=u.units_id
+            and m.sales_status_id=s.sales_status_id
+            <if test="merchandiseName!=null and  merchandiseName!=''">
+                and   concat(m.merchandise_code,
+                '!,(%!)#',m.merchandise_name,
+                '!,(%!)#',m.merchandise_specification,
+                '*!,(%!)#',m.merchandise_place_of_origin,
+                '*!,(%!)#',m.merchandise_safety_stock,
+                '*!,(%!)#',m.merchandise_actual_quntity,
+                '*!,(%!)#',m.merchandise_salse_price
+                )
+                like CONCAT('%',#{merchandiseName},'%')
+            </if>
+            <if test="productTypeId!=null and  productTypeId>0">
+                and   m.product_type_id=#{productTypeId}
+            </if>
+            <if test="salesStatusId!=null and salesStatusId>0">
+                and  m.sales_status_id=#{salesStatusId}
+            </if>
+            <if test="unitsId!=null and unitsId>0">
+                and m.units_id=#{unitsId}
+            </if>
+            <if test="merchandiseState!=null">
+                and m.merchandise_state=#{merchandiseState}
+            </if>
+            <if test="currentPage!=null and pageSize!=null">
+                LIMIT #{currentPage},#{pageSize}
+            </if>
+        </where>
+    </select>
+    <!--修改为不合作客户-->
+    <update id="noncooperation" parameterType="java.util.List">
+        <foreach collection="list" item="client" index="index" open="" close="" separator=";" >
+            update merchandise
+            <set>
+                merchandise_state=1
+            </set>
+            where merchandise_id=#{client.merchandiseId}
+        </foreach>
+    </update>
+    <!--修改为合作客户-->
+    <update id="cooperative" parameterType="java.util.List">
+        <foreach collection="list" item="client" index="index" open="" close="" separator=";" >
+            update merchandise
+            <set>
+                merchandise_state=0
+            </set>
+            where merchandise_id=#{client.merchandiseId}
+        </foreach>
+    </update>
+    <!--查询当前库存小于安全库存并且 缺货状态没有修改的-->
+    <select id="insufficientMerchandise" resultMap="merchandiseMap">
+        SELECT m.*,u.units_name FROM merchandise m
+        INNER JOIN units u
+        ON u.units_id=m.units_id
+        WHERE  m.merchandise_actual_quntity &lt;= m.merchandise_safety_stock
+        and merchandise_state!=0
+    </select>
+    <!-- 修改缺货状态成缺货-->
+    <update id="insufficient" parameterType="java.util.List">
+        <foreach collection="list" item="merchandise" index="index" open="" close="" separator=";" >
+            update merchandise
+            <set>
+                sales_status_id=1
+            </set>
+            where merchandise_id=#{merchandise.merchandiseId}
+        </foreach>
+    </update>
+</mapper>

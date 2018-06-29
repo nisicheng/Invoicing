@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+
+<mapper namespace="team.ruike.imm.dao.PermissionsDao">
+    <resultMap id="permissionsMap" type="permissions">
+        <result column="Permissions_id" property="permissionsId" />
+        <result column="Permissions_name" property="permissionsName" />
+    </resultMap>
+
+    <!--指定条件权限-->
+    <select id="selecrPermissions" resultMap="permissionsMap">
+        select * from permissions
+        <where>
+            1=1
+            <if test="permissionsId!=null and permissionsId>0">
+                and Permissions_id=#{permissionsId}
+            </if>
+            <if test="permissionsName!=null and permissionsName!=''">
+                and Permissions_name=#{permissionsName}
+            </if>
+        </where>
+        <if test="currentPage!=null and pageSize!=null">
+            LIMIT #{currentPage},#{pageSize}
+        </if>
+    </select>
+
+    <!--指定条件修改权限信息-->
+    <update id="updatePermissions" parameterType="permissions">
+        update permissions
+        <set>
+            <if test="permissionsName!=null and permissionsName!=''">
+                Permissions_name=#{permissionsName},
+            </if>
+        </set>
+        where Permissions_id=#{permissionsId}
+    </update>
+
+    <!--增加权限-->
+    <insert id="insertPermissions" parameterType="permissions">
+        insert into permissions (Permissions_name)
+        values (#{permissionsName});
+    </insert>
+</mapper>

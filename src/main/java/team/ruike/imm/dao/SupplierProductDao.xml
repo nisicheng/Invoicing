@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="team.ruike.imm.dao.SupplierProductDao">
+    <resultMap id="supplierProductMap" type="supplierProduct">
+        <result property="supplierProductId" column="supplier_product_id" />
+        <result property="supplierProductPrice" column="supplier_product_price" />
+        <result property="supplierProductState" column="supplier_product_state" />
+        <collection property="supplier" ofType="supplier">
+            <result property="supplierId;" column="supplier_id" />
+            <result property="supplierName;" column="supplier_name" />
+            <result property="supplierPersonInCharge;" column="supplier_person_in_charge" />
+            <result property="supplierPost" column="supplier_post" />
+            <result property="supplierPhone" column="supplier_phone" />
+            <result property="supplierMobilePhone;" column="supplier_mobile_phone" />
+            <result property="supplierFax" column="supplier_fax" />
+            <result property="supplierAddress" column="supplier_address" />
+            <result property="supplierFactoryAddress" column="supplier_factory_address" />
+            <result property="supplierState" column="supplier_state" />
+        </collection>
+
+        <collection property="merchandise" ofType="merchandise">
+            <result column="merchandise_id" property="merchandiseId" />
+            <result column="merchandise_code" property="productCode" />
+            <result column="merchandise_name" property="merchandiseName" />
+            <result column="merchandise_specification" property="merchandiseSpecification" />
+            <result column="product_type_id" property="productTypeId"></result>
+            <result column="units_id" property="unitsId"></result>
+            <result column="merchandise_place_of_origin" property="merchandisePlaceOfOrigin" />
+            <result column="merchandise_safety_stock" property="merchandiseSafetyStock" />
+            <result column="merchandise_actual_quntity" property="merchandiseActualQuntity" />
+            <result column="merchandise_salse_price" property="merchandiseSalsePrice" />
+            <result column="sales_status_id" property="salesStatusId"></result>
+            <result column="merchandise_state" property="merchandiseState" />
+        </collection>
+    </resultMap>
+
+    <select id="selectSupplierProduct" resultMap="supplierProductMap" parameterType="supplierProduct">
+        select * from supplier_product
+        <where>
+             1=1
+            <if test="supplierProductId!=null and supplierProductId>0">
+                  and supplier_product_id=#{supplierProductId}
+            </if>
+            <if test="merchandise_id!=null and merchandise_id>0">
+                    and merchandise_id=#{merchandiseId}
+            </if>
+            <if test="supplier_id!=null and supplier_id>0">
+                    and supplier_id=#{supplierId}
+            </if>
+            <if test="supplierProductPrice !=null and supplierProductPrice>=0">
+                 and supplier_product_price=#{supplierProductPrice}
+            </if>
+            <if test="supplierProductState !=null">
+                 and supplier_product_state=#{supplierProductState}
+            </if>
+        </where>
+        <if test="currentPage!=null and pageSize!=null">
+            LIMIT #{currentPage},#{pageSize}
+        </if>
+    </select>
+
+    <update id="updateSupplierProduct" parameterType="supplierProduct">
+        update supplier_product
+        <set>
+            <if test="merchandise_id!=null and merchandise_id>0">
+                 merchandise_id=#{merchandiseId}
+            </if>
+            <if test="supplier_id!=null and supplier_id>0">
+                  supplier_id=#{supplierId}
+            </if>
+            <if test="supplierProductPrice !=null and supplierProductPrice>=0">
+                  supplier_product_price=#{supplierProductPrice}
+            </if>
+            <if test="supplierProductState !=null">
+                  supplier_product_state=#{supplierProductState}
+            </if>
+
+        </set>
+        <where>
+            supplier_product_id=#{supplierProductId}
+        </where>
+    </update>
+    <insert id="insertSupplierProduct" parameterType="supplierProduct">
+        INSERT into supplier_product values(default,#{merchandiseId},#{supplierId},#{supplierProductPrice},#{supplierProductState})
+    </insert>
+</mapper>
+

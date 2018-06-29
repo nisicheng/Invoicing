@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+
+<mapper namespace="team.ruike.imm.dao.SupplierDao">
+    <resultMap id="supplierMap" type="supplier">
+        <result property="supplierId" column="supplier_Id" />
+        <result property="supplierName" column="supplier_name" />
+        <result property="supplierPersonInCharge" column="supplier_person_in_charge" />
+        <result property="supplierPost" column="supplier_post" />
+        <result property="supplierPhone" column="supplier_phone" />
+        <result property="supplierMobilePhone" column="supplier_mobile_phone" />
+        <result property="supplierFax" column="supplier_fax" />
+        <result property="supplierAddress" column="supplier_address" />
+        <result property="supplierFactoryAddress" column="supplier_factory_address" />
+        <result property="supplierState" column="supplier_state" />
+    </resultMap>
+
+    <select id="selectSuplier" resultMap="supplierMap" parameterType="supplier">
+        select * from supplier
+        <where>
+             1=1
+            <if test="supplierId!=null and supplierId>0">
+                  and supplier_id=#{supplierId}
+            </if>
+            <if test="supplierName !=null and supplierName!=''">
+                  and supplier_Name like concat('%',#{supplierName},'%')
+            </if>
+            <if test="supplierPersonInCharge !=null and supplierPersonInCharge!=''">
+                  and supplier_person_in_charge =#{supplierPersonInCharge}
+            </if>
+            <if test="supplierPost!=null and supplierPost !=''">
+                  and supplier_post =#{supplierPost}
+            </if>
+            <if test="supplierPhone !=null and supplierPhone !=''">
+                  and supplier_phone =#{supplierPhone}
+            </if>
+            <if test="supplierMobilePhone !=null and supplierMobilePhone!=''">
+                  and supplier_mobile_phone=#{supplierMobilePhone}
+            </if>
+            <if test="supplierFax !=null and supplierFax!=''">
+                  and supplier_fax =#{supplierFax}
+            </if>
+            <if test="supplierAddress !=null and supplierAddress!=''">
+                  and supplier_address =#{supplier_address}
+            </if>
+            <if test="supplierFactoryAddress!=null and supplierFactoryAddress!=''">
+                  and supplier_factory_address = #{supplierFactoryAddress}
+            </if>
+            <if test="supplierState !=null">
+                  and supplier_state=#{supplierState}
+            </if>
+        </where>
+        <if test="currentPage!=null and pageSize!=null">
+            LIMIT #{currentPage},#{pageSize}
+        </if>
+    </select>
+    <select id="count" resultType="int"  parameterType="supplier">
+        select count(*) from supplier
+        <where>
+            <if test="supplierName!=null and  supplierName!=''">
+                  concat(supplier_name,
+                '!,(%!)#',supplier_person_in_charge,
+                '*!,(%!)#',supplier_post,
+                '*!,(%!)#',supplier_phone,
+                '*!,(%!)#',supplier_mobile_phone,
+                '*!,(%!)#',supplier_fax,
+                '*!,(%!)#',supplier_address,
+                '*!,(%!)#',supplier_factory_address
+                )
+                like CONCAT('%',#{supplierName},'%')
+            </if>
+            <if test="supplierState!=null">
+                and supplier_state=#{supplierState}
+            </if>
+        </where>
+    </select>
+    <select id="pages" resultMap="supplierMap">
+        select * from supplier
+        <where>
+            1=1
+            <if test="supplierName!=null and  supplierName!=''">
+                and  concat(supplier_name,
+                '!,(%!)#',supplier_person_in_charge,
+                '*!,(%!)#',supplier_post,
+                '*!,(%!)#',supplier_phone,
+                '*!,(%!)#',supplier_mobile_phone,
+                '*!,(%!)#',supplier_fax,
+                '*!,(%!)#',supplier_address,
+                '*!,(%!)#',supplier_factory_address
+                )
+                like CONCAT('%',#{supplierName},'%')
+            </if>
+            <if test="supplierState!=null">
+                and supplier_state=#{supplierState}
+            </if>
+            <if test="currentPage!=null and pageSize!=null">
+                LIMIT #{currentPage},#{pageSize}
+            </if>
+        </where>
+    </select>
+
+    <update id="updateSupplier" >
+        update supplier
+        <set>
+            <if test="supplierName !=null and supplierName!=''">
+                supplier_name=#{supplierName},
+            </if>
+            <if test="supplierPersonInCharge !=null and supplierPersonInCharge!=''">
+                 supplier_person_in_charge =#{supplierPersonInCharge},
+            </if>
+            <if test="supplierPost!=null and supplierPost !=''">
+                 supplier_post =#{supplierPost},
+            </if>
+            <if test="supplierPhone !=null and supplierPhone !=''">
+                 supplier_phone =#{supplierPhone},
+            </if>
+            <if test="supplierMobilePhone !=null and supplierMobilePhone!=''">
+                 supplier_mobile_phone=#{supplierMobilePhone},
+            </if>
+            <if test="supplierFax !=null and supplierFax!=''">
+                 supplier_fax =#{supplierFax},
+            </if>
+            <if test="supplierAddress !=null and supplierAddress!=''">
+                 supplier_address =#{supplierAddress},
+            </if>
+            <if test="supplierFactoryAddress!=null and supplierFactoryAddress!=''">
+                 supplier_factory_address = #{supplierFactoryAddress},
+            </if>
+            <if test="supplierState !=null">
+                 supplier_state=#{supplierState}
+            </if>
+        </set>
+        <where>
+            supplier_id=#{supplierId}
+        </where>
+    </update>
+
+    <insert id="insertSuplier" parameterType="supplier">
+        insert into supplier values(default,#{supplierName},#{supplierPersonInCharge},#{supplierPost},#{supplierPhone},#{supplierMobilePhone},#{supplierFax},#{supplierAddress},#{supplierFactoryAddress},#{supplierState})
+    </insert>
+
+    <!--修改为不合作供应商-->
+    <update id="noncooperation" parameterType="java.util.List">
+        <foreach collection="list" item="supplier" index="index" open="" close="" separator=";" >
+            update supplier
+            <set>
+                supplier_state=1
+            </set>
+            where supplier_id=#{supplier.supplierId}
+        </foreach>
+    </update>
+    <!--修改为合作客户-->
+    <update id="cooperative" parameterType="java.util.List">
+        <foreach collection="list" item="supplier" index="index" open="" close="" separator=";" >
+            update supplier
+            <set>
+                supplier_state=0
+            </set>
+            where supplier_id=#{supplier.supplierId}
+        </foreach>
+    </update>
+</mapper>
+
