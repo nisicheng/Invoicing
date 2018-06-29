@@ -47,6 +47,11 @@
 <td>日志组件</td>
 <td><a href="http://logging.apache.org/log4j/1.2/" rel="nofollow">http://logging.apache.org/log4j/1.2/</a></td>
 </tr>
+  <tr>
+    <td>easypoi</td>
+   <td>excel导出</td>
+<td><a href="http://easypoi.mydoc.io/" rel="nofollow">http://easypoi.mydoc.io/</a></td>
+  </tr>
 <tr>
 <td>Maven</td>
 <td>项目构建管理</td>
