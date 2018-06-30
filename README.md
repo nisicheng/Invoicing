@@ -122,4 +122,4 @@
 </tr>
 </tbody></table>
 <h3>项目结构图</h3>
-![imagess](https://github.com/nisicheng/Invoicing/blob/master/src/main/webapp/images/aaa.jpg)
+![imagess](https://github.com/nisicheng/Invoicing/src/main/webapp/images/aaa.jpg)
