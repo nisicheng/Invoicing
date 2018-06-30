@@ -122,4 +122,4 @@
 </tr>
 </tbody></table>
 <h3>项目结构图</h3>
-![图片说明1](https://github.com/liuhuakun/BrushShots/blob/master/1.PNG)
+![image](https://github.com/liuhuakun/BrushShots/blob/master/1.PNG)
