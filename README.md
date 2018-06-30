@@ -125,3 +125,4 @@
 <img src="https://github.com/nisicheng/Invoicing/blob/master/src/main/webapp/images/aaa.jpg" style="width:100%"/>
 <h3>项目运行截图</h3>
 <img src="https://github.com/nisicheng/Invoicing/blob/master/src/main/webapp/images/index.png"/>
+<h3>前端大体架构模仿金蝶进销存:原地址<a href="http://vip2.youshang.com/default-new.jsp?dbid=88887840">http://vip2.youshang.com/default-new.jsp?dbid=88887840</a></h3>
