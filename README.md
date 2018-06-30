@@ -121,5 +121,5 @@
 
 </tr>
 </tbody></table>
-项目结构图
-<img src="https://github.com/nisicheng/Invoicing/blob/master/src/main/webapp/images/aaa.jpg"/>
+<h3>项目结构图</h3>
+<img src="https://github.com/nisicheng/Invoicing/blob/master/src/main/webapp/images/aaa.jpg" style="width:100%"/>
