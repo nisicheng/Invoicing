@@ -1,0 +1,74 @@
+.wrapper{ padding: 20px; min-width: 1000px; position: relative;}
+/*#config{position: absolute;top: 22px;left: 22px; z-index: 2;cursor: pointer;display: none;}*/
+.ui-btn, .ui-btn-prev, .ui-btn-next { margin-right:10px; }
+.bills{ position:relative; background:#FFFFFF; border:1px solid #CFCFCF; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); padding: 10px 20px 10px 20px; }
+.con-header { padding: 10px 0; }
+.con-header dd { float: left; line-height: 30px; }
+.con-header dd #editBills{background: url(../img/edit.png);display: inline-block;width: 13px; height: 12px;}
+.p40{ width:40%; }
+.p35{ width:35%; *width:34.9%;}
+.p30{ width:30%; *width:29.9%;}
+.p25{ width:25%; }
+.p20{ width:20%; }
+.c999 { color:#999; }
+#identifier { /*margin-right: 36px;*/ }
+/*#classes { float: right; margin-right: 10px; }*/
+#classes label { margin-left: 15px; }
+.con-footer {padding:10px 0 0 0;}
+.con-footer .mb0{margin-bottom: 0;}
+.con-footer ul {max-width: 1060px;}
+.con-footer ul li{float: left;  margin: 0 20px 10px 0;  min-width: 220px;}
+.con-footer ul li.udfLink{height:27px;line-height: 27px;}
+.con-footer ul li label { display: inline-block; width: 90px; }
+.con-footer .label-wrap{ width:75px;float:left;display:inline;line-height:30px;}
+.con-footer .ctn-wrap{ overflow:hidden; padding:0 6px 0 10px; }
+#note {   width: 100%;  height: auto;  box-sizing: border-box; vertical-align: baseline;overflow: hidden;}
+.ui-jqgrid-bdiv .ui-state-highlight { background: none; }
+.operating .ui-icon{ margin:0; }
+.ui-widget-content .ui-icon {
+	background-image: url(../img/ui-icons.png)/*{iconsContent}*/;
+}
+.ui-icon-plus { background-position:-80px 0; }
+.ui-icon-trash { background-position:-64px 0;  }
+.ui-icon-config { background-position:-304px 0; }
+.ui-state-hover .ui-icon-plus { background-position:-80px -16px; }
+.ui-state-hover .ui-icon-trash { background-position:-64px -16px; }
+.ui-icon-config { background-position:-304px 0; }
+.ui-state-hover .ui-icon-config { background-position:-304px -16px; }
+
+/*new operating style -by ywx*/
+.btn_query_inventory {background: url(../img/btn_query_inventory.png) center center no-repeat; height: 100%; width: 100%; display: block; }
+.ui-state-hover .ui-icon-plusAdd{background-image: url(../img/btn_add_normal.png);width: 100%;;height:18px}
+.ui-state-hover .ui-icon-trashDel{background-image: url(../img/btn_descease_normal.png);width: 100%;;height: 18px}
+.ui-state-hover .btn_query_inventory{background-image: url(../img/btn_query_inventory_hover.png);}
+
+#grid_locationName{text-align:left;}
+#grid_inventory,#grid_operating,#accountGrid_operating{border-right-color: #EEE}
+td[aria-describedby=grid_inventory]{border-right-color:#FFF !important;}
+td[aria-describedby=grid_operating],td[aria-describedby=accountGrid_operating]{position: relative; overflow: visible !important; border-right-color:#FFF !important;}
+.operating{width: 20px; position: absolute; margin-top: 3px; background: #EEEEEE url(../img/ui-th.png) 0 0 repeat-x; left: -27px; padding: 0 3px; display: none;height: 40px;line-height: 14px; }
+.ui-state-hover .operating{display: inline;}
+/*******************/
+
+.ui-icon-config:hover { background-position:-304px -16px; }
+.ui-state-active .ui-icon {
+	background-image: url(../img/ui-icons.png)/*{iconsActive}*/;
+}
+.has-audit{ width: 150px; height: 74px; background: url(../img/audit.png) 0 0 no-repeat; position: absolute; right: 40px; bottom: 65px; }
+.has-closed{ width: 150px; height: 74px; background: url(../img/closed.png) 0 0 no-repeat; position: absolute; right: 40px; bottom: 65px; }
+.line{ line-height:0; height:0; border:none; border-bottom:1px dashed #CCC; color:#CCC; font-size:0; margin:18px 0; }
+.ui-icon-folder-open{ display:inline-block; vertical-align:middle; margin:0 0 0 3px; }
+#bottomField{position: fixed;  top: 0;  right: 25px;  background-color: rgba(138, 138, 138, 0.21);   border-radius: 0px 0px 3px 3px;  padding: 8px;}
+#toolBottom{margin-right: -10px;}
+.shadow{-moz-box-shadow:1px 1px 3px rgba(0,0,0,.4); -webkit-box-shadow:1px 1px 3px rgba(0,0,0,.4); box-shadow:1px 1px 3px rgba(0,0,0,.4); }
+.target_box{width:150px; padding:10px; border:1px solid #aaa; background-color:#fff;}
+.target_box ul{ height:200px; overflow:auto; }
+.target_box li{padding:4px; border-bottom:1px dotted #ddd; cursor:pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+.target_box li:hover{ background:#f8f8f8; color:#cd0000;}
+#storageBox{
+	width:auto;
+}
+#storageBox li{
+	max-width:20em;
+}
+

@@ -1,0 +1,70 @@
+* {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.fl {
+    float: left;
+}
+.box {
+    height: 40px;
+    line-height: 40px;
+    position: absolute;
+    left: 50%;
+    top: 70%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+.box button {
+    padding: 0 10px;
+    margin: 0 10px;
+    height: 40px;
+    float: left;
+    cursor: pointer;
+    border: 1px solid #ebebeb;
+    background-color: #ffffff;
+}
+.box .first-page,
+.box .last-page {
+    margin: 0;
+}
+.box .pageWrap {
+    height: 40px;
+    float: left;
+    overflow: hidden;
+}
+.box .pageWrap ul {
+    width: 100000px;
+    height: 40px;
+    float: left;
+}
+.box .pageWrap ul li {
+    width: 60px;
+    height: 40px;
+    border: 1px solid #ebebeb;
+    line-height: 40px;
+    box-sizing: border-box;
+    cursor: pointer;
+    float: left;
+}
+.box .pageWrap ul .sel-page {
+    background-color: yellow;
+}
+.box .jump-text {
+    width: 60px;
+    height: 40px;
+    box-sizing: border-box;
+    text-align: center;
+    margin: 0 5px;
+    float: left;
+}
+.box .jump-button {
+    margin: 0;
+    float: left;
+}
+.box .total-pages,
+.box .total-count {
+    margin-left: 10px;
+    float: left;
+    font-size: 14px;
+}
